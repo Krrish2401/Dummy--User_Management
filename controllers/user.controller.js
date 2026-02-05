@@ -1,4 +1,5 @@
 import users from '../data/user.js'
+import { pushUser } from '../service/pushUser.js';
 
 export const createUser = (req,res)=>{
     try{
@@ -11,18 +12,11 @@ export const createUser = (req,res)=>{
             });
         }
 
-        const newUser = {
-            id: Date.now().toString(),
-            name,
-            email
-        };
-
-        users.push(newUser);
-
-        res.status(201).json({
-            success: true,
-            data: newUser
-        });
+        if(pushUser(name,email)){
+            res.status(201).json({
+                success: true,
+            });
+        }
     }
     catch(error){
         res.status(500).json({
@@ -66,6 +60,32 @@ export const updateUser = (req,res)=>{
         res.status(500).json({
             success: false,
             message:error.message
+        })
+    }
+}
+
+export const getUserById = (req,res) => {
+    try{
+        const { id } = req.body;
+
+        const target = users.find(i => i.id == id);
+
+        if (!target) {
+            res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data : target
+        })
+    }
+    catch(error){
+        res.status(500).json({
+            success: true,
+            message: error.message
         })
     }
 }
